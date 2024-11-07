@@ -1,0 +1,32 @@
+/* Navbar container styling */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #4db5ab; /* Pixel theme header color */
+    padding: 10px 20px;
+    color: #ffffff;
+  }
+  
+  /* Brand text styling */
+  .navbar-brand {
+    font-family: 'Press Start 2P', cursive; /* Pixel-Art style font */
+    font-size: 1.2em;
+    color: #000000; /* Dark text color */
+  }
+  
+  /* Profile button styling */
+  .profile-button {
+    background-color: #ff6b6b; /* Pixel theme button color */
+    border: none;
+    padding: 8px 16px;
+    color: #ffffff;
+    font-family: 'Press Start 2P', cursive;
+    cursor: pointer;
+    box-shadow: 2px 2px #c74343; /* Slight shadow for pixel effect */
+  }
+  
+  .profile-button:hover {
+    background-color: #d95757; /* Darken on hover */
+  }
+  

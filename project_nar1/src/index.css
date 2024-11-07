@@ -1,0 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #ffd700;
+  --secondary: #ff6b6b;
+  --background: #2b2b2b;
+  --text: #ffffff;
+}
+
+.pixel-font {
+  font-family: 'Press Start 2P', cursive;
+}
+
+.retro-button {
+  @apply px-6 py-3 bg-[#ffd700] text-black pixel-font border-b-4 border-[#b39700] hover:border-b-0 hover:mt-1 transition-all duration-100 cursor-pointer;
+}
+
+.game-card {
+  @apply bg-[#3a3a3a] p-4 rounded-lg cursor-pointer transform transition-all duration-300 hover:scale-105;
+}
+
+.game-card.flipped {
+  @apply bg-[#ffd700];
+}
+
+.lives {
+  @apply flex gap-2;
+}
+
+.life {
+  @apply w-6 h-6 text-red-500;
+}
+
+.timer {
+  @apply text-xl font-bold text-[#ffd700];
+}
+
+.score {
+  @apply text-xl font-bold text-[#00ff00];
+}
+
+/* Pixel art border */
+.pixel-border {
+  box-shadow: 
+    -4px -4px 0 1px #000,
+    4px -4px 0 1px #000,
+    -4px 4px 0 1px #000,
+    4px 4px 0 1px #000;
+}
+
+/* Retro gradient background */
+.retro-gradient {
+  background: linear-gradient(45deg, #2b2b2b 25%, #3a3a3a 25%, #3a3a3a 50%, #2b2b2b 50%, #2b2b2b 75%, #3a3a3a 75%, #3a3a3a);
+  background-size: 10px 10px;
+}
