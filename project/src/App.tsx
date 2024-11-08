@@ -15,11 +15,11 @@ function App() {
         <Toaster position="top-right" />
         <Routes>
           <Route path='/login' element={<LoginScreen/>}/>
-          <Route path='/dinoGameScreen' element={<DinoGameScreen/>}/>
+          <Route path='/dinoGame' element={<DinoGameScreen/>}/>
           <Route path='/' element={<HomeScreen/>}/>
           <Route path="/memoryGame" element={<Home />} />
-          <Route path="/game" element={<Game />} />
-          <Route path="/leaderboard" element={<Leaderboard />} />
+          <Route path="/memoryGame/game" element={<Game />} />
+          <Route path="/memoryGame/leaderboard" element={<Leaderboard />} />
         </Routes>
       </div>
     </Router>
