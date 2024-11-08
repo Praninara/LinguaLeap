@@ -18,4 +18,6 @@ app.get('/',(req,res)=>{
 
 app.use('/api/users',userRouter);
 
+app.use('/api/gemini',geminiRouter);
+
 app.listen(port,()=> console.log("server is running in port"))

@@ -1,0 +1,51 @@
+export const questions: Question[] = [
+  {
+    id: 1,
+    text: "What is 'Hello' in Spanish?",
+    options: ["Hola", "Bonjour", "Ciao", "Hallo"],
+    correctAnswer: "Hola",
+    level: 1
+  },
+  {
+    id: 2,
+    text: "What is 'Food' in Spanish?",
+    options: ["Nourriture", "Comida", "Cibo", "Essen"],
+    correctAnswer: "Comida",
+    level: 2
+  }
+];
+
+These are examples for how questions are to be made to help the learner learn Spanish. This is the general format:
+
+
+{
+    id: <id of the question>,
+    text: "<Spanish question with increasing difficulty per level. Increase DELE Spanish Diploma certification level of the question for every 3 levels>",
+    options: [<Generate 4 options, one of which is correct>],
+    correctAnswer: "<the correct option>",
+    level: <level>
+  },
+
+Generate questions for 5 levels. There are 5 questions per level
+
+
+
+
+api prompt dinogame:
+
+'Generate 5 stories in English, using a few keywords(at least 5 keywords) in Spanish. Each story corresponds to a level. Increase the number of keywords as the level increases. Each story must contain Spanish learning keywords words and they must increase in difficulty. Use the following format that uses French keywords and generate the stories with Spanish keywords:
+
+
+`Generate 25 Spanish learning questions in JSON format only (no TypeScript code, no code block markers, and no extra text). Each question should follow this structure:
+        {
+          "id": <number>,
+          "text": "<Spanish learning question>",
+          "options": ["<option1>", "<option2>", "<option3>", "<option4>"],
+          "correctAnswer": "<correct option>",
+          "level": <level number>
+        }
+  
+        Please return only the JSON array without any additional characters or formatting.`
+
+
+

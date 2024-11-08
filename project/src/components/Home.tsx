@@ -24,7 +24,7 @@ const Home = () => {
         </div>
 
         <div className="space-y-4">
-          <Link to="/game">
+          <Link to="/memoryGame/game">
             <button className="retro-button w-full">
               {score > 0 ? 'Continue Game' : 'Start Game'}
             </button>
