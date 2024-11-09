@@ -1,4 +1,4 @@
-# Language Learning Platform
+# LinguaLeap
 
 A gamified language learning platform featuring memory games and interactive challenges to help users learn new languages in a fun and engaging way.
 
