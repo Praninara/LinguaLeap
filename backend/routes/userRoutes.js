@@ -1,16 +1,26 @@
-import express from "express";
+import express from 'express';
+import {
+  authUser,
+  registerUser,
+  logoutUser,
+  getUserProfile,
+  updateUserProfile,
+  deleteUser,
+  updateUserXP,
+  getUserXP,
+} from '../controllers/userController.js';
+import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-import {authUser,registerUser,logoutUser,getUserProfile,updateUserProfile,getUsers,
-    deleteUser,getUserById,updateUser} from '../controllers/userController.js';
-
-import { protect,admin } from "../middleware/authMiddleware.js";
-
-router.route('/').post(registerUser).get(protect,admin,getUsers);
-router.post('/logout',logoutUser);
-router.post('/auth',authUser);
-router.route('/profile').get(protect,getUserProfile).put(protect,updateUserProfile)
-router.route('/:id').get(protect,admin,getUserById).delete(protect,admin,deleteUser).put(protect,admin,updateUser);
+router.post('/', registerUser);
+router.post('/auth', authUser);
+router.post('/logout', logoutUser);
+router.route('/profile')
+  .get(protect, getUserProfile)
+  .put(protect, updateUserProfile);
+router.delete('/:id', protect, deleteUser);
+router.post('/:name/addXP', updateUserXP);
+router.get('/:name/totalXP', getUserXP);
 
 export default router;
