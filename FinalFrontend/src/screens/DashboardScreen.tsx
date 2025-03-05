@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGameStore } from '../stores/gameStore';
-import { Trophy, Star, Gamepad2, Brain, Target, Sparkles, LogOut, Settings, User } from 'lucide-react';
+import { Trophy, Star, Gamepad2, Brain, Users, Sparkles, LogOut, Settings, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { useUserStore } from '../stores/userStore';
@@ -40,7 +40,7 @@ const DashboardScreen = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.post('http://localhost:5000/api/users/logout');
+      await axios.post('http://localhost:5001/api/users/logout');
       clearUser();
       navigate('/');
     } catch (error) {
@@ -110,7 +110,7 @@ const DashboardScreen = () => {
         </div>
 
         {/* Games Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <motion.div
             whileHover={{ scale: 1.02 }}
             className="bg-[#3a3a3a] p-6 rounded-lg pixel-border cursor-pointer"
@@ -141,6 +141,24 @@ const DashboardScreen = () => {
             <p className="text-[#ffd700] font-pixel mb-4">Learn Spanish with our Dino!</p>
             <div className="flex justify-between items-center">
               <span className="text-white font-pixel">Unlock new words</span>
+              <button className="px-4 py-2 bg-[#ffd700] text-[#2b2b2b] rounded font-pixel">
+                Play
+              </button>
+            </div>
+          </motion.div>
+
+          <motion.div
+            whileHover={{ scale: 1.02 }}
+            className="bg-[#3a3a3a] p-6 rounded-lg pixel-border cursor-pointer"
+            onClick={() => navigate('/multiplayer')}
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <Users className="w-8 h-8 text-[#ffd700]" />
+              <h2 className="text-xl font-pixel text-white">Multiplayer</h2>
+            </div>
+            <p className="text-[#ffd700] font-pixel mb-4">Play with friends!</p>
+            <div className="flex justify-between items-center">
+              <span className="text-white font-pixel">Real-time matches</span>
               <button className="px-4 py-2 bg-[#ffd700] text-[#2b2b2b] rounded font-pixel">
                 Play
               </button>

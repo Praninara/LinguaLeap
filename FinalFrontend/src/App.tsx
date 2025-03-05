@@ -9,6 +9,8 @@ import LoginScreen from './screens/LoginScreen';
 import DinoGameScreen from './screens/DinoGameScreen';
 import HomePage from './screens/Home';
 import DashboardScreen from './screens/DashboardScreen';
+import MultiplayerGame from './components/MultiplayerGame';
+import AuthGuard from './components/AuthGuard';
 
 function App() {
   return (
@@ -17,12 +19,37 @@ function App() {
         <Toaster position="top-right" />
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/dashboard" element={<DashboardScreen />} />
-          <Route path="/dinoGame" element={<DinoGameScreen />} />
+          <Route path="/dashboard" element={
+            <AuthGuard>
+              <DashboardScreen />
+            </AuthGuard>
+          } />
+          <Route path="/dinoGame" element={
+            <AuthGuard>
+              <DinoGameScreen />
+            </AuthGuard>
+          } />
           <Route path="/login" element={<HomeScreen />} />
-          <Route path="/memoryGame" element={<Home />} />
-          <Route path="/memoryGame/game" element={<Game />} />
-          <Route path="/memoryGame/leaderboard" element={<Leaderboard />} />
+          <Route path="/memoryGame" element={
+            <AuthGuard>
+              <Home />
+            </AuthGuard>
+          } />
+          <Route path="/memoryGame/game" element={
+            <AuthGuard>
+              <Game />
+            </AuthGuard>
+          } />
+          <Route path="/memoryGame/leaderboard" element={
+            <AuthGuard>
+              <Leaderboard />
+            </AuthGuard>
+          } />
+          <Route path="/multiplayer" element={
+            <AuthGuard>
+              <MultiplayerGame />
+            </AuthGuard>
+          } />
         </Routes>
       </div>
     </Router>

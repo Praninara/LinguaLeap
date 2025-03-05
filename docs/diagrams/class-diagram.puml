@@ -1,0 +1,103 @@
+@startuml
+
+' User Management
+class User {
+  +_id: string
+  +name: string
+  +email: string
+  +password: string
+  +totalXP: number
+  +createdAt: Date
+  +matchPassword(password: string): boolean
+}
+
+' Game Components
+class Game {
+  +id: string
+  +type: GameType
+  +level: number
+  +score: number
+  +startGame()
+  +endGame()
+  +updateScore()
+}
+
+class MemoryGame {
+  +cards: Card[]
+  +matchedPairs: number
+  +flipCard()
+  +checkMatch()
+  +resetGame()
+}
+
+class DinoGame {
+  +lives: number
+  +currentQuestion: Question
+  +isJumping: boolean
+  +jump()
+  +checkCollision()
+  +updateLives()
+}
+
+class MultiplayerGame {
+  +roomId: string
+  +players: Player[]
+  +currentWord: string
+  +makeGuess()
+  +leaveRoom()
+  +updateScores()
+}
+
+' Game Elements
+class Card {
+  +id: number
+  +content: string
+  +isFlipped: boolean
+  +isMatched: boolean
+  +flip()
+}
+
+class Question {
+  +id: number
+  +text: string
+  +options: string[]
+  +correctAnswer: string
+  +checkAnswer()
+}
+
+class Player {
+  +id: string
+  +username: string
+  +score: number
+  +updateScore()
+}
+
+' Store Management
+class UserStore {
+  +user: User
+  +setUser()
+  +clearUser()
+  +updateXP()
+}
+
+class GameStore {
+  +level: number
+  +score: number
+  +highScore: number
+  +updateLevel()
+  +updateScore()
+  +resetGame()
+}
+
+' Relationships
+User "1" -- "*" Game
+Game <|-- MemoryGame
+Game <|-- DinoGame
+Game <|-- MultiplayerGame
+MemoryGame "1" -- "*" Card
+DinoGame "1" -- "*" Question
+MultiplayerGame "1" -- "*" Player
+UserStore "1" -- "1" User
+GameStore "1" -- "1" Game
+
+@enduml
