@@ -1,0 +1,75 @@
+@startuml
+
+left to right direction
+skinparam packageStyle rectangle
+
+actor User
+actor "Guest User" as Guest
+actor "Authenticated User" as AuthUser
+actor "System" as System
+
+rectangle LinguaLeap {
+  ' Authentication
+  usecase "Register" as UC1
+  usecase "Login" as UC2
+  usecase "Logout" as UC3
+  usecase "Update Profile" as UC4
+
+  ' Memory Game
+  usecase "Play Memory Game" as UC5
+  usecase "View Story" as UC6
+  usecase "Match Cards" as UC7
+  usecase "Track Progress" as UC8
+
+  ' Dino Game
+  usecase "Play Dino Game" as UC9
+  usecase "Answer Questions" as UC10
+  usecase "Jump Obstacles" as UC11
+  usecase "Collect Points" as UC12
+
+  ' Multiplayer
+  usecase "Play Multiplayer" as UC13
+  usecase "Create Room" as UC14
+  usecase "Join Room" as UC15
+  usecase "Make Guess" as UC16
+
+  ' System Features
+  usecase "Generate Content" as UC17
+  usecase "Update Leaderboard" as UC18
+  usecase "Track XP" as UC19
+  usecase "Manage Sessions" as UC20
+}
+
+' Guest User
+Guest --> UC1
+Guest --> UC2
+
+' Authenticated User
+AuthUser --> UC3
+AuthUser --> UC4
+AuthUser --> UC5
+AuthUser --> UC9
+AuthUser --> UC13
+
+' Memory Game
+UC5 ..> UC6 : includes
+UC5 ..> UC7 : includes
+UC5 ..> UC8 : includes
+
+' Dino Game
+UC9 ..> UC10 : includes
+UC9 ..> UC11 : includes
+UC9 ..> UC12 : includes
+
+' Multiplayer
+UC13 ..> UC14 : includes
+UC13 ..> UC15 : includes
+UC13 ..> UC16 : includes
+
+' System
+System --> UC17
+System --> UC18
+System --> UC19
+System --> UC20
+
+@enduml
