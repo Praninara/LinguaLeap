@@ -1,2 +1,4 @@
-backend/node_modules/
+# Ignore node_modules
+node_modules/
 FinalFrontend/node_modules/
+frontend/node_modules/

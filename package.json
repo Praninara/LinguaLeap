@@ -6,7 +6,10 @@
   "type": "module",
   "scripts": {
     "start": "node backend/server.js",
-    "dev": "nodemon backend/server.js"
+    "dev": "nodemon backend/server.js",
+    "build": "tsc -b && vite build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
   },
   "author": "",
   "license": "MIT",
