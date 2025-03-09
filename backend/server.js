@@ -7,7 +7,7 @@ import { Server } from 'socket.io';
 import Redis from 'ioredis';
 import userRoutes from './routes/userRoutes.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
-import { generateWordPairs, getFallbackWordPairs } from './services/wordService.js';
+import { generateWordPairs, getFallbackWordPairs, generateMemoryPairs, generateDinoQuestions } from './services/wordService.js';
 import promClient from 'prom-client';
 
 // Prometheus metrics
@@ -94,7 +94,7 @@ const matchmakingQueue = {
 const gameLeaderboard = new Map();
 const globalLeaderboard = new Map();
 const questionCache = new Map();
-const usedQuestions = new Map(); // Track used questions per room
+const usedQuestions = new Map();
 
 // Redis/fallback operations
 async function cacheWordPairs(language, wordPairs) {
@@ -105,7 +105,6 @@ async function cacheWordPairs(language, wordPairs) {
       console.log(`Successfully cached ${wordPairs.length} word pairs for ${language}`);
     } catch (error) {
       console.error('Error caching word pairs:', error);
-      // Fallback to in-memory cache on Redis error
       if (!questionCache.has(key)) {
         questionCache.set(key, new Set());
       }
@@ -114,7 +113,6 @@ async function cacheWordPairs(language, wordPairs) {
       });
     }
   } else {
-    // Fallback to in-memory cache
     if (!questionCache.has(key)) {
       questionCache.set(key, new Set());
     }
@@ -130,7 +128,6 @@ async function getRandomWordPair(roomId, language) {
   let attempts = 0;
   const maxAttempts = 10;
 
-  // Initialize used questions set for the room if it doesn't exist
   if (!usedQuestions.has(roomId)) {
     usedQuestions.set(roomId, new Set());
   }
@@ -145,8 +142,8 @@ async function getRandomWordPair(roomId, language) {
         }
       } catch (error) {
         console.error('Error getting random word pair from Redis:', error);
-        redis = null; // Reset Redis connection on error
-        break; // Fall back to in-memory cache
+        redis = null;
+        break;
       }
     } else {
       const cache = questionCache.get(key);
@@ -162,11 +159,10 @@ async function getRandomWordPair(roomId, language) {
     attempts++;
   }
 
-  // If we've used all questions or can't find a new one, reset and fetch new batch
   if (!pair) {
     usedQuestions.get(roomId).clear();
     await prefetchWordPairs(language);
-    return getRandomWordPair(roomId, language); // Try again with fresh questions
+    return getRandomWordPair(roomId, language);
   }
 
   return pair;
@@ -178,7 +174,6 @@ async function prefetchWordPairs(language) {
     await cacheWordPairs(language, pairs);
   } catch (error) {
     console.error('Error prefetching word pairs:', error);
-    // Use fallback pairs if API fails
     const fallbackPairs = getFallbackWordPairs(language);
     await cacheWordPairs(language, fallbackPairs);
   }
@@ -206,6 +201,27 @@ app.get('/metrics', async (req, res) => {
 
 // Routes
 app.use('/api/users', userRoutes);
+
+// API endpoints for single-player games
+app.get('/api/memory-game/pairs/:level', async (req, res) => {
+  try {
+    const level = parseInt(req.params.level);
+    const pairs = await generateMemoryPairs(level);
+    res.json(pairs);
+  } catch (error) {
+    res.status(500).json({ message: 'Error generating memory pairs' });
+  }
+});
+
+app.get('/api/dino-game/questions/:level', async (req, res) => {
+  try {
+    const level = parseInt(req.params.level);
+    const questions = await generateDinoQuestions(level);
+    res.json(questions);
+  } catch (error) {
+    res.status(500).json({ message: 'Error generating questions' });
+  }
+});
 
 // API endpoints for leaderboards
 app.get('/api/leaderboard/global', async (req, res) => {
@@ -257,9 +273,7 @@ io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
   activePlayersGauge.inc();
 
-  // Handle matchmaking
   socket.on('findMatch', async ({ username, language }) => {
-    // Ensure we have word pairs cached
     const cacheKey = `wordpairs:${language}`;
     const cacheSize = redis ? 
       await redis.scard(cacheKey) : 
@@ -314,7 +328,6 @@ io.on('connection', (socket) => {
     }
   });
 
-  // Join private room
   socket.on('joinRoom', ({ roomId, username, language }) => {
     let room = gameState.get(roomId);
     
@@ -364,7 +377,6 @@ io.on('connection', (socket) => {
     }
   });
 
-  // Leave room
   socket.on('leaveRoom', ({ roomId }) => {
     const room = gameState.get(roomId);
     if (room) {
@@ -375,7 +387,7 @@ io.on('connection', (socket) => {
         socket.leave(roomId);
 
         if (room.players.length === 0) {
-          usedQuestions.delete(roomId); // Clean up used questions tracking
+          usedQuestions.delete(roomId);
           gameState.delete(roomId);
           activeGamesGauge.dec();
           io.to(roomId).emit('roomDeleted');
@@ -389,14 +401,12 @@ io.on('connection', (socket) => {
     }
   });
 
-  // Modify the startNewRound function to use Redis/fallback
   async function startNewRound(roomId) {
     const room = gameState.get(roomId);
     if (!room) return;
 
     const wordPair = await getRandomWordPair(roomId, room.language);
     if (!wordPair) {
-      // If we still can't get a word pair after resetting, use fallback
       const fallbackPairs = getFallbackWordPairs(room.language);
       const randomIndex = Math.floor(Math.random() * fallbackPairs.length);
       room.currentWord = fallbackPairs[randomIndex].word;
@@ -418,7 +428,6 @@ io.on('connection', (socket) => {
       hint: room.revealedChars
     });
 
-    // Prefetch more words if cache is running low or we've used many questions
     const cacheKey = `wordpairs:${room.language}`;
     const cacheSize = redis ? 
       await redis.scard(cacheKey) : 
@@ -426,11 +435,10 @@ io.on('connection', (socket) => {
     
     if (cacheSize < 5 || room.questionsUsed >= 10) {
       prefetchWordPairs(room.language);
-      room.questionsUsed = 0; // Reset counter after fetching new batch
+      room.questionsUsed = 0;
     }
   }
 
-  // Modify the makeGuess handler to support alternative translations
   socket.on('makeGuess', ({ roomId, guess }) => {
     const room = gameState.get(roomId);
     if (!room) return;
@@ -444,7 +452,6 @@ io.on('connection', (socket) => {
 
     if (isCorrect) {
       wordGuessCounter.inc({ correct: 'true' });
-      // Calculate score based on time taken
       const timeTaken = (Date.now() - room.roundStartTime) / 1000;
       const timeBonus = Math.max(0, Math.floor((30 - timeTaken) * 10));
       const points = 100 + timeBonus;
@@ -452,12 +459,10 @@ io.on('connection', (socket) => {
       room.scores[socket.id] += points;
       room.revealedChars = room.currentWord;
 
-      // Update game leaderboard
       const playerGameData = gameLeaderboard.get(player.username) || { score: 0 };
       playerGameData.score += points;
       gameLeaderboard.set(player.username, playerGameData);
 
-      // Update global leaderboard
       updateGlobalLeaderboard(player.username, points);
 
       io.to(roomId).emit('correctGuess', {
@@ -466,18 +471,15 @@ io.on('connection', (socket) => {
         revealedChars: room.currentWord
       });
 
-      // Send updated leaderboards
       io.to(roomId).emit('gameLeaderboardUpdate', Array.from(gameLeaderboard.entries())
         .map(([name, data]) => ({ name, ...data }))
         .sort((a, b) => b.score - a.score)
         .slice(0, 10)
       );
 
-      // Start new round after delay
       setTimeout(() => startNewRound(roomId), 2000);
     } else {
       wordGuessCounter.inc({ correct: 'false' });
-      // Partial match handling
       let newRevealedChars = '';
       let correctChars = 0;
       
@@ -512,7 +514,6 @@ io.on('connection', (socket) => {
     }
   });
 
-  // Handle disconnect
   socket.on('disconnect', () => {
     activePlayersGauge.dec();
     gameState.forEach((room, roomId) => {
@@ -522,7 +523,7 @@ io.on('connection', (socket) => {
         delete room.scores[socket.id];
         
         if (room.players.length === 0) {
-          usedQuestions.delete(roomId); // Clean up used questions tracking
+          usedQuestions.delete(roomId);
           gameState.delete(roomId);
           activeGamesGauge.dec();
         } else {
@@ -534,7 +535,6 @@ io.on('connection', (socket) => {
       }
     });
 
-    // Remove from matchmaking queue
     Object.keys(matchmakingQueue).forEach(language => {
       const index = matchmakingQueue[language].findIndex(p => p.id === socket.id);
       if (index !== -1) {

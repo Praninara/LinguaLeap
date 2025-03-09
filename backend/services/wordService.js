@@ -2,7 +2,6 @@ import fetch from 'node-fetch';
 import OpenAI from 'openai';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent';
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
@@ -11,6 +10,88 @@ const openai = new OpenAI({
   apiKey: OPENAI_API_KEY
 });
 
+// Memory Game word pair generation
+async function generateMemoryPairs(level) {
+  const prompt = `Generate 4 French word pairs for level ${level} memory game. Format as JSON array:
+  [
+    {
+      "french": "<french word>",
+      "english": "<english translation>"
+    }
+  ]`;
+
+  try {
+    counsole.log(`Attempting to generate memory pairs for level ${level} with Gemini`);
+    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.7,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 1024,
+        }
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Gemini API request failed with status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const content = data.candidates[0].content.parts[0].text;
+    const cleanedContent = content.replace(/```json|```/g, '').trim();
+    return JSON.parse(cleanedContent);
+  } catch (error) {
+    console.error('Failed to generate memory pairs:', error);
+    return FALLBACK_MEMORY_PAIRS[level - 1] || FALLBACK_MEMORY_PAIRS[0];
+  }
+}
+
+// Dino Game question generation
+async function generateDinoQuestions(level) {
+  const prompt = `Generate 5 Spanish learning questions for level ${level}. Format as JSON array:
+  [
+    {
+      "text": "<question>",
+      "options": ["<option1>", "<option2>", "<option3>", "<option4>"],
+      "correctAnswer": "<correct option>"
+    }
+  ]`;
+
+  try {
+    console.log(`Attempting to generate dino questions for level ${level}`);
+    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.7,
+          topK: 40,
+          topP: 0.95,
+          maxOutputTokens: 1024,
+        }
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Gemini API request failed with status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const content = data.candidates[0].content.parts[0].text;
+    const cleanedContent = content.replace(/```json|```/g, '').trim();
+    return JSON.parse(cleanedContent);
+  } catch (error) {
+    console.error('Failed to generate dino questions:', error);
+    return FALLBACK_DINO_QUESTIONS[level - 1] || FALLBACK_DINO_QUESTIONS[0];
+  }
+}
+
+// Multiplayer word generation
 async function generateWithGemini(language, count) {
   const prompt = `Generate ${count} ${language} word pairs for language learning. Format as JSON array:
   [
@@ -106,7 +187,6 @@ async function generateWithGPT(language, count) {
 }
 
 function validateAndFormatPairs(wordPairs, count) {
-  // Validate word pairs
   const validWordPairs = wordPairs.filter(pair => 
     pair &&
     typeof pair.word === 'string' &&
@@ -127,13 +207,11 @@ function validateAndFormatPairs(wordPairs, count) {
 
 export const generateWordPairs = async (language, count = 10) => {
   try {
-    // First try with Gemini
     try {
       return await generateWithGemini(language, count);
     } catch (geminiError) {
       console.log('Gemini API failed, trying GPT...');
       
-      // If Gemini fails, try with GPT
       try {
         return await generateWithGPT(language, count);
       } catch (gptError) {
@@ -147,7 +225,42 @@ export const generateWordPairs = async (language, count = 10) => {
   }
 };
 
-// Expanded fallback word pairs
+// Fallback data
+const FALLBACK_MEMORY_PAIRS = [
+  [
+    { french: "Bonjour", english: "Hello" },
+    { french: "Au revoir", english: "Goodbye" },
+    { french: "Merci", english: "Thank you" },
+    { french: "S'il vous plaît", english: "Please" }
+  ],
+  [
+    { french: "Chat", english: "Cat" },
+    { french: "Chien", english: "Dog" },
+    { french: "Oiseau", english: "Bird" },
+    { french: "Poisson", english: "Fish" }
+  ]
+];
+
+const FALLBACK_DINO_QUESTIONS = [
+  [
+    {
+      text: "What is 'Hello' in Spanish?",
+      options: ["Hola", "Bonjour", "Ciao", "Hallo"],
+      correctAnswer: "Hola"
+    },
+    {
+      text: "How do you say 'Thank you' in Spanish?",
+      options: ["Grazie", "Merci", "Gracias", "Danke"],
+      correctAnswer: "Gracias"
+    },
+    {
+      text: "What is 'Goodbye' in Spanish?",
+      options: ["Au revoir", "Adiós", "Arrivederci", "Auf Wiedersehen"],
+      correctAnswer: "Adiós"
+    }
+  ]
+];
+
 const FALLBACK_WORD_PAIRS = {
   french: [
     { word: "Bonjour", translation: "Hello", alternativeTranslations: [] },
@@ -179,3 +292,5 @@ export const getFallbackWordPairs = (language) => {
   console.log(`Using fallback word pairs for ${language}`);
   return FALLBACK_WORD_PAIRS[language] || [];
 };
+
+export { generateMemoryPairs, generateDinoQuestions };

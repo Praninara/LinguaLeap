@@ -2,7 +2,7 @@ import { Question } from '../types';
 import { SPANISH_QUESTIONS } from '../data/spanishQuestions';
 
 const API_KEY = 'AIzaSyC3yHpnW2gV-LQShLOit_1av0S_pDcV_8w';
-const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent';
 
 export const generateQuestions = async (level: number): Promise<Question[]> => {
   try {
