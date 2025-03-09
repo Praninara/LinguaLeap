@@ -8,24 +8,70 @@ import Redis from 'ioredis';
 import userRoutes from './routes/userRoutes.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import { generateWordPairs, getFallbackWordPairs } from './services/wordService.js';
+import promClient from 'prom-client';
 
+// Prometheus metrics
+const collectDefaultMetrics = promClient.collectDefaultMetrics;
+collectDefaultMetrics({ timeout: 5000 });
+
+// Custom metrics
+const activeGamesGauge = new promClient.Gauge({
+  name: 'active_games_total',
+  help: 'Number of active game rooms'
+});
+
+const activePlayersGauge = new promClient.Gauge({
+  name: 'active_players_total',
+  help: 'Number of connected players'
+});
+
+const wordGuessCounter = new promClient.Counter({
+  name: 'word_guesses_total',
+  help: 'Total number of word guesses',
+  labelNames: ['correct']
+});
+
+// Redis configuration with retry mechanism
 let redis;
-try {
-  redis = new Redis({
-    host: 'localhost',
-    port: 6379,
-    maxRetriesPerRequest: 1,
-    retryStrategy: () => null // Disable retries
-  });
+const initRedis = () => {
+  try {
+    redis = new Redis({
+      host: process.env.REDIS_HOST || 'redis',
+      port: parseInt(process.env.REDIS_PORT || '6379'),
+      password: 'RedisPassword123',
+      maxRetriesPerRequest: 3,
+      retryStrategy: (times) => {
+        if (times > 3) {
+          console.log('Redis retry limit exceeded, falling back to in-memory storage');
+          return null;
+        }
+        const delay = Math.min(times * 1000, 3000);
+        console.log(`Retrying Redis connection in ${delay}ms...`);
+        return delay;
+      },
+      reconnectOnError: (err) => {
+        console.log('Redis connection error:', err.message);
+        return true;
+      }
+    });
 
-  redis.on('error', (err) => {
-    console.log('Redis connection error, falling back to in-memory storage:', err.message);
-    redis = null;
-  });
-} catch (error) {
-  console.log('Failed to initialize Redis, falling back to in-memory storage:', error.message);
-  redis = null;
-}
+    redis.on('connect', () => {
+      console.log('Successfully connected to Redis');
+    });
+
+    redis.on('error', (err) => {
+      console.log('Redis connection error, falling back to in-memory storage:', err.message);
+      redis = null;
+    });
+
+    return redis;
+  } catch (error) {
+    console.log('Failed to initialize Redis, falling back to in-memory storage:', error.message);
+    return null;
+  }
+};
+
+redis = initRedis();
 
 const app = express();
 const httpServer = createServer(app);
@@ -54,7 +100,19 @@ const usedQuestions = new Map(); // Track used questions per room
 async function cacheWordPairs(language, wordPairs) {
   const key = `wordpairs:${language}`;
   if (redis) {
-    await redis.sadd(key, ...wordPairs.map(pair => JSON.stringify(pair)));
+    try {
+      await redis.sadd(key, ...wordPairs.map(pair => JSON.stringify(pair)));
+      console.log(`Successfully cached ${wordPairs.length} word pairs for ${language}`);
+    } catch (error) {
+      console.error('Error caching word pairs:', error);
+      // Fallback to in-memory cache on Redis error
+      if (!questionCache.has(key)) {
+        questionCache.set(key, new Set());
+      }
+      wordPairs.forEach(pair => {
+        questionCache.get(key).add(JSON.stringify(pair));
+      });
+    }
   } else {
     // Fallback to in-memory cache
     if (!questionCache.has(key)) {
@@ -79,10 +137,16 @@ async function getRandomWordPair(roomId, language) {
 
   while (!pair && attempts < maxAttempts) {
     if (redis) {
-      const randomPair = await redis.srandmember(key);
-      if (randomPair && !usedQuestions.get(roomId).has(randomPair)) {
-        pair = JSON.parse(randomPair);
-        usedQuestions.get(roomId).add(randomPair);
+      try {
+        const randomPair = await redis.srandmember(key);
+        if (randomPair && !usedQuestions.get(roomId).has(randomPair)) {
+          pair = JSON.parse(randomPair);
+          usedQuestions.get(roomId).add(randomPair);
+        }
+      } catch (error) {
+        console.error('Error getting random word pair from Redis:', error);
+        redis = null; // Reset Redis connection on error
+        break; // Fall back to in-memory cache
       }
     } else {
       const cache = questionCache.get(key);
@@ -129,6 +193,16 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+// Prometheus metrics endpoint
+app.get('/metrics', async (req, res) => {
+  try {
+    res.set('Content-Type', promClient.register.contentType);
+    res.end(await promClient.register.metrics());
+  } catch (err) {
+    res.status(500).end(err);
+  }
+});
 
 // Routes
 app.use('/api/users', userRoutes);
@@ -181,6 +255,7 @@ async function updateGlobalLeaderboard(username, xp) {
 // Socket.IO connection handling
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id);
+  activePlayersGauge.inc();
 
   // Handle matchmaking
   socket.on('findMatch', async ({ username, language }) => {
@@ -222,8 +297,20 @@ io.on('connection', (socket) => {
         }
       });
 
-      io.to(roomId).emit('matchFound', { roomId });
-      startNewRound(roomId);
+      // First broadcast room information
+      io.to(roomId).emit('roomInfo', {
+        roomId,
+        players: room.players,
+        scores: room.scores
+      });
+
+      // Then after a short delay, start the game
+      setTimeout(() => {
+        io.to(roomId).emit('matchFound', { roomId });
+        startNewRound(roomId);
+      }, 2000);
+
+      activeGamesGauge.inc();
     }
   });
 
@@ -245,6 +332,7 @@ io.on('connection', (socket) => {
         questionsUsed: 0
       };
       gameState.set(roomId, room);
+      activeGamesGauge.inc();
     }
 
     if (room.players.length >= 4) {
@@ -257,6 +345,14 @@ io.on('connection', (socket) => {
     room.scores[socket.id] = 0;
     socket.join(roomId);
 
+    // First broadcast room information
+    io.to(roomId).emit('roomInfo', {
+      roomId,
+      players: room.players,
+      scores: room.scores
+    });
+
+    // Then emit player joined event
     io.to(roomId).emit('playerJoined', {
       players: room.players,
       scores: room.scores
@@ -264,7 +360,7 @@ io.on('connection', (socket) => {
 
     if (room.players.length >= 2 && !room.gameStarted) {
       room.gameStarted = true;
-      startNewRound(roomId);
+      setTimeout(() => startNewRound(roomId), 2000);
     }
   });
 
@@ -281,6 +377,7 @@ io.on('connection', (socket) => {
         if (room.players.length === 0) {
           usedQuestions.delete(roomId); // Clean up used questions tracking
           gameState.delete(roomId);
+          activeGamesGauge.dec();
           io.to(roomId).emit('roomDeleted');
         } else {
           io.to(roomId).emit('playerLeft', {
@@ -346,6 +443,7 @@ io.on('connection', (socket) => {
                      room.alternativeTranslations?.includes(guessLower);
 
     if (isCorrect) {
+      wordGuessCounter.inc({ correct: 'true' });
       // Calculate score based on time taken
       const timeTaken = (Date.now() - room.roundStartTime) / 1000;
       const timeBonus = Math.max(0, Math.floor((30 - timeTaken) * 10));
@@ -378,6 +476,7 @@ io.on('connection', (socket) => {
       // Start new round after delay
       setTimeout(() => startNewRound(roomId), 2000);
     } else {
+      wordGuessCounter.inc({ correct: 'false' });
       // Partial match handling
       let newRevealedChars = '';
       let correctChars = 0;
@@ -415,6 +514,7 @@ io.on('connection', (socket) => {
 
   // Handle disconnect
   socket.on('disconnect', () => {
+    activePlayersGauge.dec();
     gameState.forEach((room, roomId) => {
       const playerIndex = room.players.findIndex(p => p.id === socket.id);
       if (playerIndex !== -1) {
@@ -424,6 +524,7 @@ io.on('connection', (socket) => {
         if (room.players.length === 0) {
           usedQuestions.delete(roomId); // Clean up used questions tracking
           gameState.delete(roomId);
+          activeGamesGauge.dec();
         } else {
           io.to(roomId).emit('playerLeft', {
             players: room.players,

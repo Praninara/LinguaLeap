@@ -30,3 +30,8 @@ export interface Story {
   content: string;
   words: Word[];
 }
+
+declare module 'react-use-keypress' {
+  const useKeypress: (keys: string[], callback: () => void) => void;
+  export default useKeypress;
+}
