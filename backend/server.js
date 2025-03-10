@@ -6,6 +6,7 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import Redis from 'ioredis';
 import userRoutes from './routes/userRoutes.js';
+import gameRoutes from './routes/gameRoutes.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import { generateWordPairs, getFallbackWordPairs, generateMemoryPairs, generateDinoQuestions } from './services/wordService.js';
 import promClient from 'prom-client';
@@ -201,6 +202,7 @@ app.get('/metrics', async (req, res) => {
 
 // Routes
 app.use('/api/users', userRoutes);
+app.use('/api/games', gameRoutes);
 
 // API endpoints for single-player games
 app.get('/api/memory-game/pairs/:level', async (req, res) => {

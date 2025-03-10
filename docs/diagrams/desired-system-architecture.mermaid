@@ -1,0 +1,91 @@
+graph TD
+
+%% 1. Client & Load Balancer
+CB["Client Browser"]
+LB["Nginx (Load Balancer)"]
+
+%% Connection from Client to LB
+CB --> LB
+
+%% 2. Frontend Subgraph
+subgraph "Frontend (React + TypeScript)"
+  RC["React Components"]
+  SM["State Management (Zustand)"]
+  FS["Frontend Services"]
+  SIC["Socket.IO Client"]
+  AHC["Axios HTTP Client"]
+  
+  RC -->|State Updates| SM
+  RC -->|API Calls| FS
+  FS -->|HTTP Requests| AHC
+  RC -->|Real-time Events| SIC
+end
+
+%% 3. Backend Subgraph
+subgraph "Backend (Node.js)"
+  ES["Express Server"]
+  SIS["Socket.IO Server"]
+  GS["Game Service"]
+  US["User Service"]
+  WS["Word Service"]
+  Auth["Authentication"]
+  Routes["Routes"]
+
+  ES -->|Route Handling| Routes
+  Routes -->|Game Logic| GS
+  Routes -->|User Management| US
+  Routes -->|Word Generation| WS
+end
+
+%% 4. Databases
+subgraph "Data Layer"
+  MDB["MongoDB"]
+  RC_DB["Redis Cache"]
+end
+
+Auth -->|User Data| MDB
+GS -->|Game State Cache| RC_DB
+WS -->|Word Cache| RC_DB
+
+%% 5. External Services
+subgraph "External Services"
+  GAPI["Google Gemini API"]
+  OAPI["OpenAI API"]
+end
+
+GS -->|Content Generation| GAPI
+WS -->|Content Generation| OAPI
+US -->|Authentication| Auth
+
+%% 6. Game Components
+subgraph "Game Components"
+  MG["Memory Game"]
+  DG["Dino Game"]
+  MPG["Multiplayer Game"]
+end
+
+MG -->|Renders| RC
+DG -->|Renders| RC
+MPG -->|Renders| RC
+
+%% 7. Connect Nginx to Frontend & Backend
+LB -->|"Serves Static Assets"| RC
+LB -->|"Routes API Calls"| ES
+SIC -->|WebSocket Connection| SIS
+AHC -->|HTTP Requests| Routes
+
+%% Notes (as comments or annotations)
+%% React Components
+RC -->|"Handles UI, Game Logic, Events"| RC
+
+%% State Management
+SM -->|"Manages User State, Game State, Progress"| SM
+
+%% Socket.IO Server
+SIS -->|"Handles Real-time Updates, Multiplayer Sync, Game Events"| SIS
+
+%% Game Service
+GS -->|"Manages Question Generation, Story Generation, Game Progress"| GS
+
+%% Redis Cache
+RC_DB -->|"Caches Game State, Word Pairs, Session Data"| RC_DB

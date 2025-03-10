@@ -1,0 +1,65 @@
+graph TD;
+
+%% Define Actors
+User("User"):::actor
+Guest("Guest User"):::actor
+AuthUser("Authenticated User"):::actor
+System("System"):::actor
+
+%% Define System Boundary (LinguaLeap)
+subgraph LinguaLeap
+  UC1["Register"]
+  UC2["Login"]
+  UC3["Logout"]
+  UC4["Update Profile"]
+
+  UC5["Play Memory Game"]
+  UC6["View Story"]
+  UC7["Match Cards"]
+  UC8["Track Progress"]
+
+  UC9["Play Dino Game"]
+  UC10["Answer Questions"]
+  UC11["Jump Obstacles"]
+  UC12["Collect Points"]
+
+  UC13["Play Multiplayer"]
+  UC14["Create Room"]
+  UC15["Join Room"]
+  UC16["Make Guess"]
+
+  UC17["Generate Content"]
+  UC18["Update Leaderboard"]
+  UC19["Track XP"]
+  UC20["Manage Sessions"]
+end
+
+%% Define Relationships
+Guest -->|Access| UC1
+Guest -->|Access| UC2
+
+AuthUser -->|Access| UC3
+AuthUser -->|Access| UC4
+AuthUser -->|Access| UC5
+AuthUser -->|Access| UC9
+AuthUser -->|Access| UC13
+
+UC5 -->|Includes| UC6
+UC5 -->|Includes| UC7
+UC5 -->|Includes| UC8
+
+UC9 -->|Includes| UC10
+UC9 -->|Includes| UC11
+UC9 -->|Includes| UC12
+
+UC13 -->|Includes| UC14
+UC13 -->|Includes| UC15
+UC13 -->|Includes| UC16
+
+System -->|Manages| UC17
+System -->|Manages| UC18
+System -->|Manages| UC19
+System -->|Manages| UC20
+
+%% Style Definitions
+classDef actor fill:#f9f,stroke:#333,stroke-width:2px;

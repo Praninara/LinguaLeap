@@ -1,0 +1,98 @@
+graph TD
+  %% Frontend Components
+  subgraph "Frontend (React + TypeScript)"
+    RC["React Components"]
+    SM["State Management (Zustand)"]
+    FS["Frontend Services"]
+    SIC["Socket.IO Client"]
+    AHC["Axios HTTP Client"]
+  end
+
+  %% Backend Components
+  subgraph "Backend (Node.js)"
+    ES["Express Server"]
+    SIS["Socket.IO Server"]
+    GS["Game Service"]
+    US["User Service"]
+    WS["Word Service"]
+    Auth["Authentication"]
+    Routes["Routes"]
+  end
+
+  %% External Services
+  subgraph "External Services"
+    GAPI["Google Gemini API"]
+    OAPI["OpenAI API"]
+  end
+
+  %% Databases
+  subgraph "Databases"
+    MDB["MongoDB"]
+    RC_DB["Redis Cache"]
+  end
+
+  %% Game Components
+  subgraph "Game Components"
+    MG["Memory Game"]
+    DG["Dino Game"]
+    MPG["Multiplayer Game"]
+  end
+
+  %% Connections
+  RC -->|State Updates| SM
+  RC -->|API Calls| FS
+  FS -->|HTTP Requests| AHC
+  RC -->|Real-time Events| SIC
+
+  SIC -->|WebSocket Connection| SIS
+  AHC -->|HTTP Requests| Routes
+
+  ES -->|Route Handling| Routes
+  Routes -->|Game Logic| GS
+  Routes -->|User Management| US
+  Routes -->|Word Generation| WS
+
+  GS -->|Content Generation| GAPI
+  WS -->|Content Generation| OAPI
+  US -->|Authentication| Auth
+
+  Auth -->|User Data| MDB
+  GS -->|Game State Cache| RC_DB
+  WS -->|Word Cache| RC_DB
+
+  MG -->|Renders| RC
+  DG -->|Renders| RC
+  MPG -->|Renders| RC
+
+  %% Notes
+  RC:::note -->|Handles UI, Game Logic, Events| Note1
+  SM:::note -->|Manages User State, Game State, Progress| Note2
+  SIS:::note -->|Handles Real-time Updates, Multiplayer Sync, Game Events| Note3
+  GS:::note -->|Manages Question Generation, Story Generation, Game Progress| Note4
+  RC_DB:::note -->|Caches Game State, Word Pairs, Session Data| Note5
+
+  classDef note fill:#f9f9f9,stroke:#333,stroke-width:1px,font-size:12px;
+
+  %% System Boundaries
+  subgraph "Frontend Layer"
+    RC
+    SM
+    FS
+    SIC
+    AHC
+  end
+
+  subgraph "Backend Layer"
+    ES
+    SIS
+    GS
+    US
+    WS
+    Auth
+    Routes
+  end
+
+  subgraph "Data Layer"
+    MDB
+    RC_DB
+  end
