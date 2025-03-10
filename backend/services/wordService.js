@@ -10,7 +10,13 @@ const openai = new OpenAI({
   apiKey: OPENAI_API_KEY
 });
 
-// Memory Game word pair generation
+/**
+ * Generate memory game word pairs
+ * Uses Gemini API with fallback to predefined pairs
+ * 
+ * @param {number} level - Difficulty level
+ * @returns {Promise<Array>} Array of word pairs
+ */
 async function generateMemoryPairs(level) {
   const prompt = `Generate 4 French word pairs for level ${level} memory game. Format as JSON array:
   [
@@ -21,7 +27,7 @@ async function generateMemoryPairs(level) {
   ]`;
 
   try {
-    counsole.log(`Attempting to generate memory pairs for level ${level} with Gemini`);
+    console.log(`Attempting to generate memory pairs for level ${level} with Gemini`);
     const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -50,7 +56,13 @@ async function generateMemoryPairs(level) {
   }
 }
 
-// Dino Game question generation
+/**
+ * Generate dino game questions
+ * Uses Gemini API with fallback to predefined questions
+ * 
+ * @param {number} level - Difficulty level
+ * @returns {Promise<Array>} Array of question objects
+ */
 async function generateDinoQuestions(level) {
   const prompt = `Generate 5 Spanish learning questions for level ${level}. Format as JSON array:
   [
@@ -91,7 +103,13 @@ async function generateDinoQuestions(level) {
   }
 }
 
-// Multiplayer word generation
+/**
+ * Generate word pairs using Gemini API
+ * 
+ * @param {string} language - Target language
+ * @param {number} count - Number of pairs to generate
+ * @returns {Promise<Array>} Array of word pairs
+ */
 async function generateWithGemini(language, count) {
   const prompt = `Generate ${count} ${language} word pairs for language learning. Format as JSON array:
   [
@@ -143,6 +161,14 @@ async function generateWithGemini(language, count) {
   }
 }
 
+/**
+ * Generate word pairs using GPT API
+ * Fallback for when Gemini API fails
+ * 
+ * @param {string} language - Target language
+ * @param {number} count - Number of pairs to generate
+ * @returns {Promise<Array>} Array of word pairs
+ */
 async function generateWithGPT(language, count) {
   const prompt = `Generate ${count} ${language} word pairs for language learning. Format as JSON array:
   [
@@ -186,6 +212,14 @@ async function generateWithGPT(language, count) {
   }
 }
 
+/**
+ * Validate and format word pairs
+ * Ensures all pairs have required properties
+ * 
+ * @param {Array} wordPairs - Array of word pairs to validate
+ * @param {number} count - Expected number of pairs
+ * @returns {Array} Validated and formatted pairs
+ */
 function validateAndFormatPairs(wordPairs, count) {
   const validWordPairs = wordPairs.filter(pair => 
     pair &&
@@ -205,6 +239,14 @@ function validateAndFormatPairs(wordPairs, count) {
   }));
 }
 
+/**
+ * Main word pair generation function
+ * Tries multiple APIs with fallback
+ * 
+ * @param {string} language - Target language
+ * @param {number} count - Number of pairs to generate
+ * @returns {Promise<Array>} Array of word pairs
+ */
 export const generateWordPairs = async (language, count = 10) => {
   try {
     try {
@@ -225,7 +267,7 @@ export const generateWordPairs = async (language, count = 10) => {
   }
 };
 
-// Fallback data
+// Fallback data for when APIs fail
 const FALLBACK_MEMORY_PAIRS = [
   [
     { french: "Bonjour", english: "Hello" },
@@ -288,6 +330,13 @@ const FALLBACK_WORD_PAIRS = {
   ]
 };
 
+/**
+ * Get fallback word pairs for a language
+ * Used when all APIs fail
+ * 
+ * @param {string} language - Target language
+ * @returns {Array} Predefined word pairs
+ */
 export const getFallbackWordPairs = (language) => {
   console.log(`Using fallback word pairs for ${language}`);
   return FALLBACK_WORD_PAIRS[language] || [];

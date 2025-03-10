@@ -2,9 +2,13 @@ import asyncHandler from 'express-async-handler';
 import User from '../models/userModel.js';
 import generateToken from '../utils/generateToken.js';
 
-// @desc    Auth user & get token
-// @route   POST /api/users/auth
-// @access  Public
+/**
+ * Authenticate user and get token
+ * @route   POST /api/users/auth
+ * @access  Public
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
 const authUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
@@ -25,9 +29,13 @@ const authUser = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc    Register a new user
-// @route   POST /api/users
-// @access  Public
+/**
+ * Register a new user
+ * @route   POST /api/users
+ * @access  Public
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
 const registerUser = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
 
@@ -60,9 +68,13 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc    Logout user / clear cookie
-// @route   POST /api/users/logout
-// @access  Public
+/**
+ * Logout user and clear cookie
+ * @route   POST /api/users/logout
+ * @access  Public
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
 const logoutUser = (req, res) => {
   res.cookie('jwt', '', {
     httpOnly: true,
@@ -71,9 +83,13 @@ const logoutUser = (req, res) => {
   res.status(200).json({ message: 'Logged out successfully' });
 };
 
-// @desc    Get user profile
-// @route   GET /api/users/profile
-// @access  Private
+/**
+ * Get user profile
+ * @route   GET /api/users/profile
+ * @access  Private
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
 const getUserProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
 
@@ -90,9 +106,13 @@ const getUserProfile = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc    Update user profile
-// @route   PUT /api/users/profile
-// @access  Private
+/**
+ * Update user profile
+ * @route   PUT /api/users/profile
+ * @access  Private
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
 const updateUserProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
 
@@ -118,9 +138,13 @@ const updateUserProfile = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc    Delete user
-// @route   DELETE /api/users/:id
-// @access  Private
+/**
+ * Delete user account
+ * @route   DELETE /api/users/:id
+ * @access  Private
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
 const deleteUser = asyncHandler(async (req, res) => {
   const user = await User.findById(req.params.id);
 
@@ -138,9 +162,13 @@ const deleteUser = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc    Update user XP
-// @route   POST /api/users/:name/addXP
-// @access  Private
+/**
+ * Update user XP
+ * @route   POST /api/users/:name/addXP
+ * @access  Private
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
 const updateUserXP = asyncHandler(async (req, res) => {
   const { xp } = req.body;
   const user = await User.findOne({ name: req.params.name });
@@ -159,9 +187,13 @@ const updateUserXP = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc    Get user XP
-// @route   GET /api/users/:name/totalXP
-// @access  Private
+/**
+ * Get user XP
+ * @route   GET /api/users/:name/totalXP
+ * @access  Private
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ */
 const getUserXP = asyncHandler(async (req, res) => {
   const user = await User.findOne({ name: req.params.name });
 

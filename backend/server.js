@@ -1,3 +1,4 @@
+// Import required dependencies
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
@@ -11,11 +12,11 @@ import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import { generateWordPairs, getFallbackWordPairs, generateMemoryPairs, generateDinoQuestions } from './services/wordService.js';
 import promClient from 'prom-client';
 
-// Prometheus metrics
+// Initialize Prometheus metrics collection
 const collectDefaultMetrics = promClient.collectDefaultMetrics;
 collectDefaultMetrics({ timeout: 5000 });
 
-// Custom metrics
+// Custom Prometheus metrics
 const activeGamesGauge = new promClient.Gauge({
   name: 'active_games_total',
   help: 'Number of active game rooms'
@@ -32,7 +33,12 @@ const wordGuessCounter = new promClient.Counter({
   labelNames: ['correct']
 });
 
-// Redis configuration with retry mechanism
+/**
+ * Redis Configuration with Retry Mechanism
+ * - Handles connection failures gracefully
+ * - Implements retry strategy with backoff
+ * - Falls back to in-memory storage if Redis is unavailable
+ */
 let redis;
 const initRedis = () => {
   try {
@@ -74,6 +80,7 @@ const initRedis = () => {
 
 redis = initRedis();
 
+// Initialize Express app and create HTTP server
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
@@ -86,7 +93,10 @@ const io = new Server(httpServer, {
 
 const port = process.env.PORT || 5001;
 
-// In-memory storage (Redis alternative)
+/**
+ * In-memory Storage (Redis Alternative)
+ * Used as fallback when Redis is unavailable
+ */
 const gameState = new Map();
 const matchmakingQueue = {
   french: [],
@@ -97,7 +107,11 @@ const globalLeaderboard = new Map();
 const questionCache = new Map();
 const usedQuestions = new Map();
 
-// Redis/fallback operations
+/**
+ * Cache word pairs in Redis or fallback storage
+ * @param {string} language - Target language for word pairs
+ * @param {Array} wordPairs - Array of word pairs to cache
+ */
 async function cacheWordPairs(language, wordPairs) {
   const key = `wordpairs:${language}`;
   if (redis) {
@@ -123,6 +137,16 @@ async function cacheWordPairs(language, wordPairs) {
   }
 }
 
+/**
+ * Get a random word pair for a game room
+ * - Tracks used questions per room
+ * - Handles Redis failures gracefully
+ * - Implements automatic question rotation
+ * 
+ * @param {string} roomId - Game room identifier
+ * @param {string} language - Target language
+ * @returns {Object} Word pair object
+ */
 async function getRandomWordPair(roomId, language) {
   const key = `wordpairs:${language}`;
   let pair = null;
@@ -169,6 +193,13 @@ async function getRandomWordPair(roomId, language) {
   return pair;
 }
 
+/**
+ * Prefetch word pairs for a language
+ * - Ensures content availability
+ * - Handles API failures with fallback content
+ * 
+ * @param {string} language - Target language
+ */
 async function prefetchWordPairs(language) {
   try {
     const pairs = await generateWordPairs(language, 20);
@@ -180,7 +211,7 @@ async function prefetchWordPairs(language) {
   }
 }
 
-// Middleware
+// Middleware Configuration
 app.use(cors({
   origin: 'http://localhost:5173',
   credentials: true,
@@ -200,11 +231,11 @@ app.get('/metrics', async (req, res) => {
   }
 });
 
-// Routes
+// API Routes
 app.use('/api/users', userRoutes);
 app.use('/api/games', gameRoutes);
 
-// API endpoints for single-player games
+// Single-player game endpoints
 app.get('/api/memory-game/pairs/:level', async (req, res) => {
   try {
     const level = parseInt(req.params.level);
@@ -225,7 +256,7 @@ app.get('/api/dino-game/questions/:level', async (req, res) => {
   }
 });
 
-// API endpoints for leaderboards
+// Leaderboard endpoints
 app.get('/api/leaderboard/global', async (req, res) => {
   try {
     const users = await mongoose.model('User').find().sort('-totalXP').limit(10).select('name totalXP -_id');
@@ -243,11 +274,15 @@ app.get('/api/leaderboard/game/:gameId', (req, res) => {
   res.json(gameLeaderboardData);
 });
 
-// Error Handling
+// Error Handling Middleware
 app.use(notFound);
 app.use(errorHandler);
 
-// Helper function to update global leaderboard
+/**
+ * Update global leaderboard and persist to database
+ * @param {string} username - Player username
+ * @param {number} xp - Experience points to add
+ */
 async function updateGlobalLeaderboard(username, xp) {
   try {
     const user = await mongoose.model('User').findOne({ name: username });
@@ -313,14 +348,12 @@ io.on('connection', (socket) => {
         }
       });
 
-      // First broadcast room information
       io.to(roomId).emit('roomInfo', {
         roomId,
         players: room.players,
         scores: room.scores
       });
 
-      // Then after a short delay, start the game
       setTimeout(() => {
         io.to(roomId).emit('matchFound', { roomId });
         startNewRound(roomId);
@@ -360,14 +393,12 @@ io.on('connection', (socket) => {
     room.scores[socket.id] = 0;
     socket.join(roomId);
 
-    // First broadcast room information
     io.to(roomId).emit('roomInfo', {
       roomId,
       players: room.players,
       scores: room.scores
     });
 
-    // Then emit player joined event
     io.to(roomId).emit('playerJoined', {
       players: room.players,
       scores: room.scores
@@ -403,6 +434,14 @@ io.on('connection', (socket) => {
     }
   });
 
+  /**
+   * Start a new game round
+   * - Fetches new word pair
+   * - Updates game state
+   * - Notifies players
+   * 
+   * @param {string} roomId - Game room identifier
+   */
   async function startNewRound(roomId) {
     const room = gameState.get(roomId);
     if (!room) return;

@@ -5,6 +5,13 @@ import { FALLBACK_STORIES } from '../data/frenchStories.js';
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent';
 
+/**
+ * Generate questions for a specific level
+ * Uses Gemini API with fallback to predefined questions
+ * 
+ * @param {number} level - Difficulty level
+ * @returns {Promise<Array>} Array of question objects
+ */
 export const generateQuestions = async (level) => {
   try {
     const prompt = `Generate 10 Spanish learning questions as a JSON array. Each question should follow this format exactly:
@@ -33,6 +40,7 @@ export const generateQuestions = async (level) => {
     const cleanedContent = content.replace(/```json|```/g, "").trim();
     const questions = JSON.parse(cleanedContent);
 
+    // Validate generated questions
     const validQuestions = questions.filter(q => (
       q.text && 
       Array.isArray(q.options) && 
@@ -51,6 +59,13 @@ export const generateQuestions = async (level) => {
   }
 };
 
+/**
+ * Generate stories for language learning
+ * Uses Gemini API with fallback to predefined stories
+ * 
+ * @param {number} startLevel - Starting difficulty level
+ * @returns {Promise<Array>} Array of story objects
+ */
 export const generateStories = async (startLevel = 1) => {
   const prompt = `Generate 5 French learning stories for level ${startLevel}. Format as JSON array:
   [
@@ -95,6 +110,7 @@ export const generateStories = async (startLevel = 1) => {
     const cleanedContent = content.replace(/```json|```/g, '').trim();
     const stories = JSON.parse(cleanedContent);
 
+    // Validate generated stories
     const validStories = stories.filter(story => {
       return (
         story &&
@@ -124,11 +140,24 @@ export const generateStories = async (startLevel = 1) => {
   }
 };
 
+/**
+ * Get fallback questions for a specific level
+ * Used when API generation fails
+ * 
+ * @param {number} level - Difficulty level
+ * @returns {Array} Filtered and shuffled questions
+ */
 const getFallbackQuestions = (level) => {
   const questionsForLevel = SPANISH_QUESTIONS.filter(q => q.level <= level);
   return shuffleArray(questionsForLevel);
 };
 
+/**
+ * Shuffle array using Fisher-Yates algorithm
+ * 
+ * @param {Array} array - Array to shuffle
+ * @returns {Array} New shuffled array
+ */
 const shuffleArray = (array) => {
   const newArray = [...array];
   for (let i = newArray.length - 1; i > 0; i--) {

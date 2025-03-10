@@ -1,6 +1,10 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
+/**
+ * User Schema
+ * Defines the structure for user documents in MongoDB
+ */
 const userSchema = mongoose.Schema(
   {
     name: {
@@ -21,17 +25,27 @@ const userSchema = mongoose.Schema(
       default: 0,
     },
   },
-  {
+   {
     timestamps: true,
   }
 );
 
-// Match user entered password to hashed password in database
+/**
+ * Password comparison method
+ * Compares provided password with hashed password in database
+ * 
+ * @param {string} enteredPassword - Password provided during login
+ * @returns {Promise<boolean>} True if passwords match, false otherwise
+ */
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-// Encrypt password using bcrypt
+/**
+ * Pre-save middleware
+ * Automatically hashes password before saving to database
+ * Only runs if password field has been modified
+ */
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
     next();
