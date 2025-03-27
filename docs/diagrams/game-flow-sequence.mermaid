@@ -1,0 +1,32 @@
+sequenceDiagram
+    participant C as Client
+    participant N as Nginx
+    participant B as Backend Server
+    participant AI as AI Service
+    participant R as Redis
+
+    C->>N: Request game content
+    N->>B: Forward request
+    B->>AI: Generate questions/stories
+    AI-->>B: Content generated
+    B->>R: Cache content
+    R-->>B: Cached
+    B-->>N: Send response
+    N-->>C: Deliver content
+
+    loop Game Progress
+        C->>N: Submit answer
+        N->>B: Forward submission
+        B->>R: Get correct answer
+        R-->>B: Return answer
+        B->>B: Validate answer
+        B-->>N: Send result
+        N-->>C: Update score/progress
+    end
+
+    C->>N: Complete level
+    N->>B: Update progress
+    B->>R: Update user stats
+    R-->>B: Stats updated
+    B-->>N: Send rewards
+    N-->>C: Show completion

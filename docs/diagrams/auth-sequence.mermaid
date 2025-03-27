@@ -1,0 +1,27 @@
+sequenceDiagram
+    participant C as Client
+    participant N as Nginx
+    participant B as Backend Server
+    participant R as Redis
+    participant M as MongoDB
+
+    C->>N: POST /api/users/auth
+    N->>B: Forward request
+    B->>M: Find user by email
+    M-->>B: Return user data
+    B->>B: Verify password
+    B->>R: Generate and store JWT
+    R-->>B: Confirm token stored
+    B-->>N: Send auth response + cookie
+    N-->>C: Forward response
+
+    Note over C,N: User is now authenticated
+
+    C->>N: Subsequent requests with JWT
+    N->>B: Forward with JWT
+    B->>R: Validate token
+    R-->>B: Token valid
+    B->>M: Get user data
+    M-->>B: Return data
+    B-->>N: Send response
+    N-->>C: Forward response

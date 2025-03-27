@@ -1,0 +1,31 @@
+sequenceDiagram
+    participant C as Client
+    participant N as Nginx
+    participant WS as WebSocket Server
+    participant R as Redis
+    participant G as Game Service
+
+    C->>N: WebSocket connection request
+    N->>WS: Upgrade connection
+    WS-->>C: Connection established
+
+    C->>WS: Join matchmaking
+    WS->>R: Add to matchmaking queue
+    R-->>WS: Queue updated
+
+    loop Matchmaking
+        WS->>R: Check for match
+        R-->>WS: Match found
+        WS->>G: Create game room
+        G-->>WS: Room created
+        WS-->>C: Match found, join room
+    end
+
+    loop Game Loop
+        C->>WS: Make guess
+        WS->>G: Process guess
+        G->>R: Update game state
+        R-->>G: State updated
+        G-->>WS: Broadcast result
+        WS-->>C: Update game state
+    end
