@@ -1,12 +1,16 @@
 {
-  "name": "language",
+  "name": "language-learning-platform",
   "version": "1.0.0",
   "description": "Language Learning Platform",
-  "main": "server.js",
   "type": "module",
   "scripts": {
-    "start": "node backend/server.js",
-    "dev": "nodemon backend/server.js",
+    "start:server1": "node backend/server1.js",
+    "start:server2": "node backend/server2.js",
+    "start:server3": "node backend/server3.js",
+    "start:all": "concurrently \"npm run start:server1\" \"npm run start:server2\" \"npm run start:server3\"",
+    "dev:server1": "nodemon backend/server1.js",
+    "dev:server2": "nodemon backend/server2.js",
+    "dev:server3": "nodemon backend/server3.js",
     "build": "tsc -b && vite build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -30,6 +34,7 @@
     "socket.io": "^4.7.4"
   },
   "devDependencies": {
-    "nodemon": "^3.0.1"
+    "nodemon": "^3.0.1",
+    "concurrently": "^8.2.2"
   }
 }

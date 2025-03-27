@@ -1,16 +1,76 @@
-version: '3.8'
-
 services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - server1
+      - server2
+      - server3
+    networks:
+      - app-network
+
   # Backend Service
-  backend:
-    build:
-      context: .
-      dockerfile: backend/Dockerfile
+  server1:
+    build: .
+    command: node backend/server1.js
     ports:
       - "5001:5001"
     environment:
       - NODE_ENV=production
       - PORT=5001
+      - MONGODB_URI=mongodb+srv://narayanaudayagiri88:narayanaudayagiri88@cluster0.xfb8w.mongodb.net/synergy
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    env_file:
+      - .env
+    volumes:
+      - ./backend:/app/backend
+      - /app/node_modules
+    depends_on:
+      redis:
+        condition: service_healthy
+      prometheus:
+        condition: service_started
+    networks:
+      - app-network
+
+  server2:
+    build: .
+    command: node backend/server2.js
+    ports:
+      - "5002:5002"
+    environment:
+      - NODE_ENV=production
+      - PORT=5002
+      - MONGODB_URI=mongodb+srv://narayanaudayagiri88:narayanaudayagiri88@cluster0.xfb8w.mongodb.net/synergy
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    env_file:
+      - .env
+    volumes:
+      - ./backend:/app/backend
+      - /app/node_modules
+    depends_on:
+      redis:
+        condition: service_healthy
+      prometheus:
+        condition: service_started
+    networks:
+      - app-network
+
+  server3:
+    build: .
+    command: node backend/server3.js
+    ports:
+      - "5003:5003"
+    environment:
+      - NODE_ENV=production
+      - PORT=5003
       - MONGODB_URI=mongodb+srv://narayanaudayagiri88:narayanaudayagiri88@cluster0.xfb8w.mongodb.net/synergy
       - REDIS_HOST=redis
       - REDIS_PORT=6379
@@ -42,7 +102,7 @@ services:
       - ./FinalFrontend:/app
       - /app/node_modules
     depends_on:
-      - backend
+      - nginx
     networks:
       - app-network
 

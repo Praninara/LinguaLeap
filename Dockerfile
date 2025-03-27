@@ -1,19 +1,20 @@
 # Use Node.js official image
 FROM node:18
 
+# Set working directory inside the container
 WORKDIR /app
 
-# Copy package files first for better caching
+# Copy package files first (for caching)
 COPY package*.json ./
 
 # Install dependencies
 RUN npm install
 
-# Copy the rest of the application code
-COPY . .
+# Copy backend code into the container
+COPY ./backend /app/backend
 
-# Expose the port
-EXPOSE 5173
+# Expose the port (handled by docker-compose)
+EXPOSE 5000
 
-# Start the frontend development server
-CMD ["npm", "run", "dev", "--", "--host"]
+# Default command (overridden by docker-compose)
+CMD ["node"]
