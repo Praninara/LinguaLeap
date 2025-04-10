@@ -188,6 +188,11 @@ npm start
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
+## Current Contributors:
+1. Pradyun Devarakonda
+2. Narayana Srimanth
+3. Anirudh Pathaneni
+4. Rohit Komaragiri
 ## 📝 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
