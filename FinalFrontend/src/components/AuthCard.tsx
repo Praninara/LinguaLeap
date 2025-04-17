@@ -118,13 +118,6 @@ const AuthCard: React.FC<AuthCardProps> = ({
           </button>
         </form>
       </div>
-
-      {/* Default State */}
-      {/* <div className={`text-center ${activePanel === 'none' ? 'block' : 'hidden'}`}>
-        <div className="font-pixel text-indigo-200 animate-pulse">
-          Press Start
-        </div>
-      </div> */}
     </div>
   );
 };

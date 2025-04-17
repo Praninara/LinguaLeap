@@ -1,3 +1,8 @@
+declare module 'react-use-keypress' {
+  const useKeypress: (keys: string[], callback: () => void) => void;
+  export default useKeypress;
+}
+
 export interface Question {
   id: number;
   text: string;
@@ -29,9 +34,4 @@ export interface Story {
   title: string;
   content: string;
   words: Word[];
-}
-
-declare module 'react-use-keypress' {
-  const useKeypress: (keys: string[], callback: () => void) => void;
-  export default useKeypress;
 }

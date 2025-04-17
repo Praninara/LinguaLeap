@@ -5,7 +5,6 @@ import Leaderboard from './components/MemoryGame_Leaderboard';
 import Home from './components/Home';
 import './App.css';
 import HomeScreen from './screens/HomeScreen';
-import LoginScreen from './screens/LoginScreen';
 import DinoGameScreen from './screens/DinoGameScreen';
 import HomePage from './screens/Home';
 import DashboardScreen from './screens/DashboardScreen';

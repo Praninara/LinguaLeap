@@ -13,7 +13,10 @@ interface LoadingScreenProps {
 }
 
 const LoadingScreen: React.FC<LoadingScreenProps> = ({ game, facts }) => {
-  const randomFact = facts[Math.floor(Math.random() * facts.length)];
+  const hasFacts = facts.length > 0;
+  const randomFact = hasFacts
+    ? facts[Math.floor(Math.random() * facts.length)]
+    : null;
 
   return (
     <div className="min-h-screen bg-[#2b2b2b] flex items-center justify-center p-6">
@@ -45,20 +48,26 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ game, facts }) => {
           <p className="text-white font-pixel mb-6">Loading your language adventure...</p>
         </div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="bg-[#2b2b2b] p-6 rounded-lg mb-6"
-        >
-          <div className="flex items-start gap-4">
-            <BookOpen className="w-6 h-6 text-[#ffd700] flex-shrink-0 mt-1" />
-            <div>
-              <p className="text-white font-pixel mb-2">{randomFact.text}</p>
-              <p className="text-sm text-[#ffd700] font-pixel">Source: {randomFact.source}</p>
+        {hasFacts && randomFact ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="bg-[#2b2b2b] p-6 rounded-lg mb-6"
+          >
+            <div className="flex items-start gap-4">
+              <BookOpen className="w-6 h-6 text-[#ffd700] flex-shrink-0 mt-1" />
+              <div>
+                <p className="text-white font-pixel mb-2">{randomFact.text}</p>
+                <p className="text-sm text-[#ffd700] font-pixel">
+                  Source: {randomFact.source}
+                </p>
+              </div>
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
+        ) : (
+          <p className="text-white font-pixel text-center mb-6">Fun fact coming soon!</p>
+        )}
 
         <div className="flex justify-center">
           <motion.div

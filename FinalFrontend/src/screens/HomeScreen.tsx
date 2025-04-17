@@ -1,4 +1,3 @@
-import React from 'react'
 import Navbar from '../components/Navbar'
 import Statistics from '../components/Statistics'
 import DailyChallenges from '../components/DailyChallanges'

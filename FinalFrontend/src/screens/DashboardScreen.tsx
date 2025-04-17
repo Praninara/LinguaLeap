@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGameStore } from '../stores/gameStore';
-import { Trophy, Star, Gamepad2, Brain, Users, Sparkles, LogOut, Settings, User } from 'lucide-react';
+import { Gamepad2, Brain, Users, LogOut, Settings, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { useUserStore } from '../stores/userStore';

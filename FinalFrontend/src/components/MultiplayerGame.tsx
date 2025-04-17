@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { io, Socket } from 'socket.io-client';
+import { io } from 'socket.io-client';
 import { Users, Send, Crown, ArrowLeft, Gamepad2, Shuffle, Trophy, LogOut } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useUserStore } from '../stores/userStore';

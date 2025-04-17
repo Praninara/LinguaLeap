@@ -1,4 +1,3 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { SPANISH_QUESTIONS } from '../data/spanishQuestions.js';
 import { FALLBACK_STORIES } from '../data/frenchStories.js';
 

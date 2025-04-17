@@ -1,4 +1,3 @@
-import React from 'react';
 import Game from '../components/DinoGame_Game';
 import Leaderboard from '../components/DinoGame_Leaderboard';
 import { motion } from 'framer-motion';

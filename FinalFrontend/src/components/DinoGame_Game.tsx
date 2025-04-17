@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Player } from '../types';
+import { useState, useEffect } from 'react';
+import { Player, Question } from '../types';
 import { Gamepad2, Pause, Play } from 'lucide-react';
 import DinoGame from './DinoGame';
 import QuestionPanel from './QuestionPanel';

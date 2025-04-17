@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import useKeypress from 'react-use-keypress';
 import { motion } from 'framer-motion';
 import { useGameStore } from '../stores/gameStore';
@@ -14,7 +14,7 @@ import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { generateStories } from '../services/storyService';
 import { frenchFacts } from '../data/languageFacts';
-import type { Story, Word } from '../types';
+import type { Story } from '../types';
 import { useUserStore } from '../stores/userStore';
 import axios from 'axios';
 
@@ -70,7 +70,7 @@ const Game = () => {
       try {
         const stories = await generateStories(level);
         const storyIndex = (level - 1) % stories.length;
-        setCurrentStory(stories[storyIndex]);
+        setCurrentStory(stories[storyIndex] ?? null);
       } catch (error) {
         console.error('Failed to fetch story:', error);
       } finally {
@@ -164,11 +164,14 @@ const Game = () => {
     if (selectedCards.length === 1) {
       const firstCard = selectedCards[0];
       const secondCard = card;
+    
+      if (!firstCard) return;
+    
       const matchFound = currentStory.words.some(pair => 
         (firstCard.french && secondCard.english && firstCard.french === pair.french && secondCard.english === pair.english) ||
         (firstCard.english && secondCard.french && firstCard.english === pair.english && secondCard.french === pair.french)
       );
-
+    
       if (matchFound) {
         setTimeout(() => {
           const updatedCards = cards.map((c) => 
