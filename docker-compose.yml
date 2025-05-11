@@ -15,9 +15,9 @@ services:
   # Backend Service
   server1:
     build: .
-    command: node backend/server1.js
+    command: node backend/server1.js    
     ports:
-      - "5001:5001"
+      - "5001:5001"    
     environment:
       - NODE_ENV=production
       - PORT=5001
@@ -93,9 +93,9 @@ services:
     build:
       context: ./FinalFrontend
       dockerfile: Dockerfile
-    ports:
+      ports:
       - "5173:5173"
-    environment:
+      environment:
       - NODE_ENV=development
       - VITE_API_URL=http://localhost:5001
     volumes:
@@ -152,6 +152,18 @@ services:
       - GF_USERS_ALLOW_SIGN_UP=false
     depends_on:
       - prometheus
+    networks:
+      - app-network
+
+  locust:
+    image: locustio/locust
+    ports:
+      - "8089:8089"
+    volumes:
+      - ./tests:/mnt/locust
+    command: -f /mnt/locust/locustfile.py --host http://nginx
+    depends_on:
+      - nginx
     networks:
       - app-network
 
