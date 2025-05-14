@@ -40,6 +40,14 @@ const wordGuessCounter = new promClient.Counter({
  * - Falls back to in-memory storage if Redis is unavailable
  */
 let redis;
+/**
+ * Initializes Redis connection with retry mechanism
+ * - Tries to connect to Redis with a maximum of 3 retries
+ * - Implements retry strategy with exponential backoff
+ * - Falls back to in-memory storage if Redis connection fails
+ * - Listens for connect and error events
+ * @returns {Redis} Redis connection object
+ */
 const initRedis = () => {
   try {
     redis = new Redis({
@@ -85,7 +93,7 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: 'http://localhost:5173',
+    origin: 'https://praninara.github.io',
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE']
   }
@@ -213,7 +221,7 @@ async function prefetchWordPairs(language) {
 
 // Middleware Configuration
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin:'https://praninara.github.io',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE']
 }));

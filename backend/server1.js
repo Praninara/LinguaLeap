@@ -85,7 +85,7 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: 'http://localhost:5173',
+    origin:'https://praninara.github.io',
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE']
   }
@@ -213,7 +213,7 @@ async function prefetchWordPairs(language) {
 
 // Middleware Configuration
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: 'https://praninara.github.io',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE']
 }));
