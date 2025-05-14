@@ -93,9 +93,9 @@ services:
     build:
       context: ./FinalFrontend
       dockerfile: Dockerfile
-      ports:
+    ports:
       - "5173:5173"
-      environment:
+    environment:
       - NODE_ENV=development
       - VITE_API_URL=http://localhost:5001
     volumes:
