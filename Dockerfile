@@ -17,4 +17,4 @@ COPY ./backend /app/backend
 EXPOSE 5000
 
 # Default command (overridden by docker-compose)
-CMD ["node"]
+CMD ["node", "backend/server.js"]
