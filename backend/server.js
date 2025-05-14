@@ -654,14 +654,6 @@ const wordGuessCounter = new promClient.Counter({
  * - Falls back to in-memory storage if Redis is unavailable
  */
 let redis;
-/**
- * Initializes Redis connection with retry mechanism
- * - Tries to connect to Redis with a maximum of 3 retries
- * - Implements retry strategy with exponential backoff
- * - Falls back to in-memory storage if Redis connection fails
- * - Listens for connect and error events
- * @returns {Redis} Redis connection object
- */
 const initRedis = () => {
   try {
     redis = new Redis({
@@ -835,7 +827,7 @@ async function prefetchWordPairs(language) {
 
 // Middleware Configuration
 app.use(cors({
-  origin:'https://praninara.github.io',
+  origin: 'https://praninara.github.io',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE']
 }));
@@ -851,6 +843,11 @@ app.get('/metrics', async (req, res) => {
   } catch (err) {
     res.status(500).end(err);
   }
+});
+
+// Base route
+app.get('/', (req, res) => {
+  res.send('Welcome to LinguaLeap API');
 });
 
 // API Routes

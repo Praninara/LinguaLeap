@@ -40,9 +40,9 @@ import { protect } from '../middleware/authMiddleware.js';
 const router = express.Router();
 
 // Public routes
-router.post('/register', registerUser);  // BACKEND_URL + '/users'
-router.post('/auth', authUser);          // BACKEND_URL + '/users/auth'
-router.post('/logout', logoutUser);      // BACKEND_URL + '/logout'
+router.post('/', registerUser);         // BACKEND_URL + '/api/users'
+router.post('/auth', authUser);         // BACKEND_URL + '/users/auth'
+router.post('/logout', logoutUser);     // BACKEND_URL + '/logout'
 
 // Protected routes
 router.route('/profile')
