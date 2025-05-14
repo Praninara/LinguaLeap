@@ -651,7 +651,8 @@ let redis;
 const initRedis = () => {
   try {
     redis = new Redis({
-      host: process.env.REDIS_HOST || 'redis',
+      // host: process.env.REDIS_HOST || 'redis',
+      host: process.env.REDIS_HOST || 'red-d0i8kt24d50c73b7ag20',
       port: parseInt(process.env.REDIS_PORT || '6379'),
       password: 'RedisPassword123',
       maxRetriesPerRequest: 3,
