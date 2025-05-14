@@ -48,7 +48,7 @@ const Game = () => {
     }
 
     try {
-      const response = await axios.post(`http://localhost:5001/api/users/${user.name}/addXP`, { 
+      const response = await axios.post(`https://lingualeap-backend.onrender.com/api/users/${user.name}/addXP`, {
         xp: xpToAdd 
       });
       

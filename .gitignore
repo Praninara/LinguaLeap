@@ -5,3 +5,4 @@ FinalFrontend/node_modules/
 .idea/
 tests/__pycache__/
 FinalFrontend/dist/
+/.env.production

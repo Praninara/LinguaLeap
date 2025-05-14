@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { useUserStore } from '../stores/userStore';
 import axios from 'axios';
+import { BACKEND_URL } from '../config'  ;
 
 const DashboardScreen = () => {
   const navigate = useNavigate();
@@ -40,7 +41,7 @@ const DashboardScreen = () => {
 
   const handleLogout = async () => {
     try {
-      await axios.post('http://localhost:5001/api/users/logout');
+      await axios.post( BACKEND_URL + '/logout');
       clearUser();
       navigate('/');
     } catch (error) {

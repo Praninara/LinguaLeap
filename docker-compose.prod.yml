@@ -82,7 +82,8 @@ services:
       dockerfile: Dockerfile
     environment:
       - NODE_ENV=${NODE_ENV}
-      - VITE_API_URL=http://localhost:5001
+      - VITE_API_URL= https://lingualeap-backend.onrender.com
+#      - VITE_API_URL=http://localhost:5001
     env_file:
       - .env
     networks:

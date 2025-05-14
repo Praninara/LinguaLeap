@@ -99,7 +99,8 @@ services:
       - "5173:5173"
     environment:
       - NODE_ENV=development
-      - VITE_API_URL=http://localhost:5001
+      - VITE_API_URL= https://lingualeap-backend.onrender.com
+#      - VITE_API_URL=http://localhost:5001
     volumes:
       - ./FinalFrontend:/app
       - /app/node_modules

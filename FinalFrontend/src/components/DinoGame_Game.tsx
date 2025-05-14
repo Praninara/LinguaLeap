@@ -15,6 +15,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useUserStore } from '../stores/userStore';
 import axios from 'axios';
+import {BACKEND_URL} from "../config.ts";
 
 const Game = () => {
   const navigate = useNavigate();
@@ -42,7 +43,7 @@ const Game = () => {
     }
 
     try {
-      const response = await axios.post(`http://localhost:5001/api/users/${user.name}/addXP`, { 
+      const response = await axios.post(BACKEND_URL + `/users/${user.name}/addXP`, {
         xp: xpToAdd 
       });
       

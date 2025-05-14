@@ -5,6 +5,7 @@ import AuthCard from '../components/AuthCard';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useUserStore } from '../stores/userStore';
+import {BACKEND_URL} from "../config.ts";
 
 export interface UserData {
   name: string;
@@ -25,7 +26,7 @@ function HomePage() {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:5001/api/users', formData);
+      await axios.post(BACKEND_URL + '/users', formData);
       setActivePanel('login');
       setFormData({ name: '', email: '', password: '' });
     } catch (error: any) {
@@ -36,7 +37,7 @@ function HomePage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:5001/api/users/auth', {
+      const response = await axios.post(BACKEND_URL + '/users/auth', {
         email: formData.email,
         password: formData.password,
       });
