@@ -1,3 +1,63 @@
+/*!*@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');*!*/
+
+/*!*@tailwind base;*!*/
+/*!*@tailwind components;*!*/
+/*!*@tailwind utilities;*!*/
+
+/*!*:root {*!*/
+/*!*  --primary: #ffd700;*!*/
+/*!*  --secondary: #ff6b6b;*!*/
+/*!*  --background: #2b2b2b;*!*/
+/*!*  --text: #ffffff;*!*/
+/*!*}*!*/
+
+/*!*.pixel-font {*!*/
+/*!*  font-family: 'Press Start 2P', cursive;*!*/
+/*!*}*!*/
+
+/*!*.retro-button {*!*/
+/*!*  @apply px-6 py-3 bg-[#ffd700] text-black pixel-font border-b-4 border-[#b39700] hover:border-b-0 hover:mt-1 transition-all duration-100 cursor-pointer;*!*/
+/*!*}*!*/
+
+/*!*.game-card {*!*/
+/*!*  @apply bg-[#3a3a3a] p-4 rounded-lg cursor-pointer transform transition-all duration-300 hover:scale-105;*!*/
+/*!*}*!*/
+
+/*!*.game-card.flipped {*!*/
+/*!*  @apply bg-[#ffd700];*!*/
+/*!*}*!*/
+
+/*!*.lives {*!*/
+/*!*  @apply flex gap-2;*!*/
+/*!*}*!*/
+
+/*!*.life {*!*/
+/*!*  @apply w-6 h-6 text-red-500;*!*/
+/*!*}*!*/
+
+/*!*.timer {*!*/
+/*!*  @apply text-xl font-bold text-[#ffd700];*!*/
+/*!*}*!*/
+
+/*!*.score {*!*/
+/*!*  @apply text-xl font-bold text-[#00ff00];*!*/
+/*!*}*!*/
+
+/*!*!* Pixel art border *!*!*/
+/*!*.pixel-border {*!*/
+/*!*  box-shadow: *!*/
+/*!*    -4px -4px 0 1px #000,*!*/
+/*!*    4px -4px 0 1px #000,*!*/
+/*!*    -4px 4px 0 1px #000,*!*/
+/*!*    4px 4px 0 1px #000;*!*/
+/*!*}*!*/
+
+/*!*!* Retro gradient background *!*!*/
+/*!*.retro-gradient {*!*/
+/*!*  background: linear-gradient(45deg, #2b2b2b 25%, #3a3a3a 25%, #3a3a3a 50%, #2b2b2b 50%, #2b2b2b 75%, #3a3a3a 75%, #3a3a3a);*!*/
+/*!*  background-size: 10px 10px;*!*/
+/*!*}*!*/
+
 /*@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');*/
 
 /*@tailwind base;*/
@@ -16,11 +76,11 @@
 /*}*/
 
 /*.retro-button {*/
-/*  @apply px-6 py-3 bg-[#ffd700] text-black pixel-font border-b-4 border-[#b39700] hover:border-b-0 hover:mt-1 transition-all duration-100 cursor-pointer;*/
+/*  @apply px-4 py-2 md:px-6 md:py-3 bg-[#ffd700] text-black pixel-font border-b-4 border-[#b39700] hover:border-b-0 hover:mt-1 transition-all duration-100 cursor-pointer text-sm md:text-base;*/
 /*}*/
 
 /*.game-card {*/
-/*  @apply bg-[#3a3a3a] p-4 rounded-lg cursor-pointer transform transition-all duration-300 hover:scale-105;*/
+/*  @apply bg-[#3a3a3a] p-2 md:p-4 rounded-lg cursor-pointer transform transition-all duration-300 hover:scale-105;*/
 /*}*/
 
 /*.game-card.flipped {*/
@@ -28,28 +88,38 @@
 /*}*/
 
 /*.lives {*/
-/*  @apply flex gap-2;*/
+/*  @apply flex gap-1 md:gap-2;*/
 /*}*/
 
 /*.life {*/
-/*  @apply w-6 h-6 text-red-500;*/
+/*  @apply w-4 h-4 md:w-6 md:h-6 text-red-500;*/
 /*}*/
 
 /*.timer {*/
-/*  @apply text-xl font-bold text-[#ffd700];*/
+/*  @apply text-base md:text-xl font-bold text-[#ffd700];*/
 /*}*/
 
 /*.score {*/
-/*  @apply text-xl font-bold text-[#00ff00];*/
+/*  @apply text-base md:text-xl font-bold text-[#00ff00];*/
 /*}*/
 
 /*!* Pixel art border *!*/
 /*.pixel-border {*/
-/*  box-shadow: */
-/*    -4px -4px 0 1px #000,*/
-/*    4px -4px 0 1px #000,*/
-/*    -4px 4px 0 1px #000,*/
-/*    4px 4px 0 1px #000;*/
+/*  box-shadow:*/
+/*          -2px -2px 0 1px #000,*/
+/*          2px -2px 0 1px #000,*/
+/*          -2px 2px 0 1px #000,*/
+/*          2px 2px 0 1px #000;*/
+/*}*/
+
+/*@media (min-width: 768px) {*/
+/*  .pixel-border {*/
+/*    box-shadow:*/
+/*            -4px -4px 0 1px #000,*/
+/*            4px -4px 0 1px #000,*/
+/*            -4px 4px 0 1px #000,*/
+/*            4px 4px 0 1px #000;*/
+/*  }*/
 /*}*/
 
 /*!* Retro gradient background *!*/
@@ -57,6 +127,73 @@
 /*  background: linear-gradient(45deg, #2b2b2b 25%, #3a3a3a 25%, #3a3a3a 50%, #2b2b2b 50%, #2b2b2b 75%, #3a3a3a 75%, #3a3a3a);*/
 /*  background-size: 10px 10px;*/
 /*}*/
+
+/*!* Responsive text sizes *!*/
+/*@media (max-width: 768px) {*/
+/*  h1 {*/
+/*    @apply text-2xl;*/
+/*  }*/
+/*  h2 {*/
+/*    @apply text-xl;*/
+/*  }*/
+/*  p {*/
+/*    @apply text-sm;*/
+/*  }*/
+/*  .pixel-font {*/
+/*    font-size: 0.8rem;*/
+/*  }*/
+/*}*/
+
+/*!* Responsive container padding *!*/
+/*.container {*/
+/*  @apply px-4 md:px-6 lg:px-8;*/
+/*}*/
+
+/*!* Responsive grid layouts *!*/
+/*.grid-container {*/
+/*  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6;*/
+/*}*/
+
+/*!* Responsive spacing *!*/
+/*.spacing {*/
+/*  @apply my-2 md:my-4 lg:my-6;*/
+/*}*/
+
+/*!* Game board responsiveness *!*/
+/*.game-board {*/
+/*  @apply grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4;*/
+/*}*/
+
+/*!* Modal responsiveness *!*/
+/*.modal-content {*/
+/*  @apply w-[90%] md:w-[80%] lg:w-[60%] max-w-2xl mx-auto;*/
+/*}*/
+
+/*!* Button group responsiveness *!*/
+/*.button-group {*/
+/*  @apply flex flex-col md:flex-row gap-2 md:gap-4;*/
+/*}*/
+
+/*!* Card responsiveness *!*/
+/*.card {*/
+/*  @apply p-3 md:p-4 lg:p-6;*/
+/*}*/
+
+/*!* Navigation responsiveness *!*/
+/*.nav-container {*/
+/*  @apply flex flex-col md:flex-row items-center justify-between;*/
+/*}*/
+
+/*!* Form responsiveness *!*/
+/*.form-container {*/
+/*  @apply w-full md:w-[80%] lg:w-[60%] mx-auto;*/
+/*}*/
+
+/*!* Input field responsiveness *!*/
+/*.input-field {*/
+/*  @apply w-full p-2 md:p-3 text-sm md:text-base;*/
+/*}*/
+
 
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
