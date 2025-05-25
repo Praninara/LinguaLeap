@@ -1,4 +1,7 @@
 # LinguaLeap - Interactive Language Learning Platform
+<img width="322" alt="Screenshot 2025-05-25 at 10 26 49" src="https://github.com/user-attachments/assets/498642bc-c618-49b4-a2b2-7e5a0f3cd8bc" />
+
+
 
 A gamified language learning platform featuring multiple interactive games and real-time multiplayer challenges to help users learn new languages in a fun and engaging way.
 
